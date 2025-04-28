@@ -1,25 +1,57 @@
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Go build artifacts
+/bin/
+/build/
+/dist/
+/*.exe
+/*.exe~
+/*.dll
+/*.so
+/*.dylib
+/*.test
 
 # Go workspace file
 go.work
 go.work.sum
 
-# env file
+# Output of go coverage tool
+*.out
+
+# Dependency directories (rare, but safe to ignore)
+vendor/
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker-related
+docker-compose.override.yml
 .env
+.env.* 
+*.env
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Node Modules (if you ever add frontend code later)
+node_modules/
+
+# Terraform (if you later automate AWS deployment)
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# SnapCrumb specific (optional if you create local dev files)
+local_config.yaml
