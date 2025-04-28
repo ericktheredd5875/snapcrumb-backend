@@ -55,6 +55,7 @@ CREATE TABLE urls (
     expires_at TIMESTAMP,
     visit_count INTEGER DEFAULT 0
 );
+```
 
 ## 📦 Project Structure
 
