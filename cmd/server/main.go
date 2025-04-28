@@ -1,17 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/ericktheredd5875/snapcrumb-backend/internal/api"
 )
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "👋 Welcome to SnapCrumb! Shorten your links in a snap.")
-}
-
 func main() {
-	http.HandleFunc("/", HomeHandler)
+	// Welcome Message
+	http.HandleFunc("/", api.HomeHandler)
+
+	// POST: Shorten URL
+	http.HandleFunc("/shorten", api.ShortenURLHandler)
+
+	// GET: Redirect to original URL (shortcode param)
+	http.HandleFunc("/{shortcode}", api.RedirectHandler)
 
 	port := "8080"
 	log.Printf("🚀 SnapCrumb server starting on port %s...", port)
