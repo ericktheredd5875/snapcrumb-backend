@@ -25,3 +25,13 @@ func InitDB(connStr string) {
 
 	log.Println("✅ Successfully connected to the database")
 }
+
+// InsertURL: Insert a new URL into the database
+func InsertURL(originalURL, shortcode string) error {
+	query := `
+		INSERT INTO urls (original_url, shortcode)
+		VALUES ($1, $2)
+	`
+	_, err := DB.Exec(query, originalURL, shortcode)
+	return err
+}

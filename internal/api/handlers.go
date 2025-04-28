@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
 )
 
 // Request Body struct
@@ -47,6 +49,11 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	shortcode := generateShortCode(6)
 
 	// Store the URL in the database
+	err = db.InsertURL(req.URL, shortcode)
+	if err != nil {
+		http.Error(w, "Failed to store URL in database", http.StatusInternalServerError)
+		return
+	}
 
 	// Create the shortened URL
 	domain := "http://localhost:8080"
