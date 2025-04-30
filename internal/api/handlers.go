@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
-	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils/shortcode"
+	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -46,7 +46,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate a unique shortcode (Using Randome String Generator)
-	shortcode := shortcode.GenerateShortCode(6)
+	shortcode := utils.GenerateShortCode(6)
 
 	// Store the URL in the database
 	err = db.InsertURL(req.URL, shortcode)

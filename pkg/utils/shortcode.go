@@ -1,4 +1,4 @@
-package shortcode
+package utils
 
 import (
 	"math/rand"
