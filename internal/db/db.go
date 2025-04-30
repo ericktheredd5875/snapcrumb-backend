@@ -27,6 +27,8 @@ func InitDB(connStr string) {
 }
 
 // InsertURL: Insert a new URL into the database
+//   - Todo: If Insert fails with a unique_violation error,
+//     generate a new shortcode and retry.
 func InsertURL(originalURL, shortcode string) error {
 	query := `
 		INSERT INTO urls (original_url, shortcode)
@@ -34,4 +36,18 @@ func InsertURL(originalURL, shortcode string) error {
 	`
 	_, err := DB.Exec(query, originalURL, shortcode)
 	return err
+}
+
+func GetOriginalURLByShortcode(shortcode string) (string, error) {
+	var originalURL string
+	query := "SELECT original_url FROM urls WHERE shortcode = $1;"
+	err := DB.QueryRow(query, shortcode).Scan(&originalURL)
+	if err == sql.ErrNoRows {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+
+	return originalURL, nil
 }

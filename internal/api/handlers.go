@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
+	"github.com/gorilla/mux"
 )
 
 // Request Body struct
@@ -69,7 +70,22 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 
 // RedirectHandler: Redirect to original URL GET /{shortcode}
 func RedirectHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "🔗 SnapCrumb: Redirecting based on shortcode.")
+	vars := mux.Vars(r)
+	shortcode := vars["shortcode"]
+
+	originalURL, err := db.GetOriginalURLByShortcode(shortcode)
+	if err != nil {
+		fmt.Fprintln(w, "Error: ", err)
+		http.Error(w, "Server error", http.StatusInternalServerError)
+		return
+	}
+
+	if originalURL == "" {
+		http.Error(w, "Shortcode not found", http.StatusNotFound)
+		return
+	}
+
+	http.Redirect(w, r, originalURL, http.StatusSeeOther)
 }
 
 // generateShortCode: Generate a random shortcode
