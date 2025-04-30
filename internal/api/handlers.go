@@ -3,12 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
+	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils/shortcode"
 	"github.com/gorilla/mux"
 )
 
@@ -47,7 +46,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate a unique shortcode (Using Randome String Generator)
-	shortcode := generateShortCode(6)
+	shortcode := shortcode.GenerateShortCode(6)
 
 	// Store the URL in the database
 	err = db.InsertURL(req.URL, shortcode)
@@ -86,16 +85,4 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, originalURL, http.StatusSeeOther)
-}
-
-// generateShortCode: Generate a random shortcode
-func generateShortCode(length int) string {
-	rand.Seed(time.Now().UnixNano())
-	chars := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-	var b strings.Builder
-	for i := 0; i < length; i++ {
-		b.WriteRune(chars[rand.Intn(len(chars))])
-	}
-
-	return b.String()
 }
