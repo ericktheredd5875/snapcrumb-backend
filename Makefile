@@ -2,6 +2,15 @@
 
 APP_NAME=snapcrumb
 
+# Detect OS and set binary appropriately
+ifeq ($(OS),Windows_NT)
+	BINARY_EXT=.exe
+else
+	BINARY_EXT=
+endif
+
+BINARY=bin/$(APP_NAME)$(BINARY_EXT)
+
 .PHONY: all build run test tidy clean dev
 
 # Run go mod tidy
@@ -10,7 +19,7 @@ tidy:
 
 # Build the Go binary
 build:
-	go build -o bin/$(APP_NAME) ./cmd/server
+	go build -o $(BINARY) ./cmd/server
 
 # Run the server (Requires DB to be running)
 run:
@@ -22,9 +31,8 @@ test:
 
 # Clean the build binary
 clean: 
-	rm -rf bin/
+	rm -rf bin tmp
 
 # Run dev server with auto-reload
 dev:
 	air -c .air.toml
-	# air -c .air.toml
