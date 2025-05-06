@@ -93,6 +93,20 @@ docker-compose up --build
 http://localhost:8080
 ```
 
+## 🚀 Development
+
+To start the server with auto-reloading:
+
+- **On macOS/Linux**:
+```bash
+  ./dev.sh
+```
+- **On Windows (PowerShell)**:
+```powershell
+./dev.ps1
+```
+**Requires air (https://github.com/air-verse/air) to be installed**
+
 
 ## 📈 Future Improvements (Roadmap)
 
