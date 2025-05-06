@@ -18,3 +18,5 @@ func GenerateShortCode(length int) string {
 
 	return b.String()
 }
+
+// Testing
