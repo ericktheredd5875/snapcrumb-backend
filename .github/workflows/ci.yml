@@ -9,6 +9,24 @@ on:
 jobs:
     test:
         runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:17
+                ports:
+                    - 5432:5432
+                env:
+                    POSTGRES_USER: snapcrumb
+                    POSTGRES_PASSWORD: snapcrumb
+                    POSTGRES_DB: snapcrumb_test
+                options: >-
+                    --health-cmd "pg_isready -U snapcrumb -d snapcrumb_test"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        env:
+            POSTGRES_URL: "postgres://snapcrumb:snapcrumb@localhost:5432/snapcrumb_test?sslmode=disable"
         steps:
             - name: Checkout Code
               uses: actions/checkout@v4
@@ -28,6 +46,11 @@ jobs:
                 restore-keys: |
                   ${{ runner.os }}-go-
 
+            - name: Wait for DB to be ready
+              run: |
+                echo "Waiting for Postgres to be ready..."
+                sleep 10
+            
             - name: Tidy Modules
               run: go mod tidy
 

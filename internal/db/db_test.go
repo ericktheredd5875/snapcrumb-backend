@@ -7,8 +7,12 @@ import (
 
 // Connects to test DB
 func TestMain(m *testing.M) {
-	connStr := "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
-	InitDB(connStr)
+
+	dsn := os.Getenv("POSTGRES_URL")
+	if dsn == "" {
+		dsn = "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
+	}
+	InitDB(dsn)
 
 	code := m.Run()
 	os.Exit(code)
