@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"testing"
 
@@ -8,5 +9,6 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	log.Println("Running Main Test")
 	os.Exit(dbtest.Setup(m))
 }

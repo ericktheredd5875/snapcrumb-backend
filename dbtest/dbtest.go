@@ -22,14 +22,17 @@ func Setup(m *testing.M) int {
 	if err != nil {
 		log.Fatalf("Failed to connect to test db: %v", err)
 	}
+	log.Println("Connected to test db")
 
 	if err := TestDB.Ping(); err != nil {
 		log.Fatalf("Failed to ping test db: %v", err)
 	}
+	log.Println("Pinged test db")
 
 	if err := resetSchema(); err != nil {
 		log.Fatalf("Failed to reset schema: %v", err)
 	}
+	log.Println("Reset schema")
 
 	return m.Run()
 }
