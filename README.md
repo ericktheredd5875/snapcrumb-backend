@@ -7,6 +7,10 @@ Built with modern backend practices, Dockerized for easy deployment, and ready f
 
 ---
 
+![Coverage](https://codecov.io/gh/yourusername/snapcrumb/branch/main/graph/badge.svg)
+
+---
+
 ## 🛠️ Features
 
 - Shorten long URLs into small, easy-to-share links

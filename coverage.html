@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>server: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/ericktheredd5875/snapcrumb-backend/cmd/server/main.go (0.0%)</option>
+				
+				<option value="file1">github.com/ericktheredd5875/snapcrumb-backend/dbtest/dbtest.go (71.4%)</option>
+				
+				<option value="file2">github.com/ericktheredd5875/snapcrumb-backend/dbtest/migrations.go (0.0%)</option>
+				
+				<option value="file3">github.com/ericktheredd5875/snapcrumb-backend/internal/api/handlers.go (0.0%)</option>
+				
+				<option value="file4">github.com/ericktheredd5875/snapcrumb-backend/internal/db/db.go (78.9%)</option>
+				
+				<option value="file5">github.com/ericktheredd5875/snapcrumb-backend/pkg/utils/shortcode.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "log"
+        "net/http"
+
+        "github.com/gorilla/mux"
+
+        "github.com/ericktheredd5875/snapcrumb-backend/internal/api"
+        "github.com/ericktheredd5875/snapcrumb-backend/internal/db"
+)
+
+func main() <span class="cov0" title="0">{
+
+        // Initialize Router
+        router := mux.NewRouter()
+
+        // Welcome Message
+        router.HandleFunc("/", api.HomeHandler).Methods("GET")
+
+        // POST: Shorten URL
+        router.HandleFunc("/shorten", api.ShortenURLHandler).Methods("POST")
+
+        // GET: Redirect to original URL (shortcode param)
+        router.HandleFunc("/{shortcode}", api.RedirectHandler).Methods("GET")
+
+        // Initialize DB
+        db.InitDB("postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb?sslmode=disable")
+
+        port := "8080"
+        log.Printf("🚀 SnapCrumb server starting on port %s...", port)
+        err := http.ListenAndServe(":"+port, router)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("🚨 Failed to start server: %v", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package dbtest
+
+import (
+        "database/sql"
+        "log"
+        "os"
+        "testing"
+
+        _ "github.com/lib/pq"
+)
+
+// TestDB is the shared test database connection
+var testDB *sql.DB
+
+func SetupDB(m *testing.M) int <span class="cov8" title="1">{
+        dsn := os.Getenv("POSTGRES_URL")
+        if dsn == "" </span><span class="cov8" title="1">{
+                dsn = "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
+        }</span>
+
+        <span class="cov8" title="1">var err error
+        testDB, err = sql.Open("postgres", dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to connect to test db: %v", err)
+        }</span>
+        <span class="cov8" title="1">log.Println("Connected to test db")
+
+        if err := testDB.Ping(); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to ping test db: %v", err)
+        }</span>
+        <span class="cov8" title="1">log.Println("Pinged test db")
+
+        if err := resetSchema(); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to reset schema: %v", err)
+        }</span>
+        <span class="cov8" title="1">log.Println("Reset schema")
+
+        return m.Run()</span>
+}
+
+// Reset the schema
+func resetSchema() error <span class="cov8" title="1">{
+        schema := `
+        DROP TABLE IF EXISTS urls;
+        CREATE TABLE urls (
+                id SERIAL PRIMARY KEY,
+                original_url VARCHAR(255) NOT NULL,
+                shortcode VARCHAR(255) NOT NULL UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        `
+        _, err := testDB.Exec(schema)
+        return err
+}</span>
+
+func CleanDB(t *testing.T) <span class="cov0" title="0">{
+        _, err := testDB.Exec("TRUNCATE TABLE urls RESTART IDENTITY CASCADE;")
+        if err != nil </span><span class="cov0" title="0">{
+                t.Fatalf("Failed to truncate test db: %v", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package dbtest
+
+import (
+        "database/sql"
+        "fmt"
+        "log"
+        "os"
+        "testing"
+
+        _ "github.com/lib/pq"
+
+        "github.com/golang-migrate/migrate/v4"
+        "github.com/golang-migrate/migrate/v4/database/postgres"
+        _ "github.com/golang-migrate/migrate/v4/source/file"
+)
+
+var TestDB *sql.DB
+
+func Setup(m *testing.M) int <span class="cov0" title="0">{
+        dsn := os.Getenv("DATABASE_URL")
+        if dsn == "" </span><span class="cov0" title="0">{
+                dsn = "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
+        }</span>
+
+        <span class="cov0" title="0">var err error
+        TestDB, err = sql.Open("postgres", dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("failed to connect to test db: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">if err := runMigrations(TestDB); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("failed to run migrations: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">return m.Run()</span>
+}
+
+func runMigrations(db *sql.DB) error <span class="cov0" title="0">{
+        driver, err := postgres.WithInstance(db, &amp;postgres.Config{})
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create migration driver: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">m, err := migrate.NewWithDatabaseInstance(
+                "file://db/migrations",
+                "postgres",
+                driver,
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create migration instance: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">_ = m.Down()
+        err = m.Up()
+        if err != nil &amp;&amp; err != migrate.ErrNoChange </span><span class="cov0" title="0">{
+                return fmt.Errorf("migration failed: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package api
+
+import (
+        "encoding/json"
+        "fmt"
+        "net/http"
+        "strings"
+
+        "github.com/ericktheredd5875/snapcrumb-backend/internal/db"
+        "github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
+        "github.com/gorilla/mux"
+)
+
+// Request Body struct
+type shortenRequest struct {
+        URL string `json:"url"`
+}
+
+// Response Body struct
+type shortenResponse struct {
+        Shortcode    string `json:"shortcode"`
+        ShortenedURL string `json:"shortened_url"`
+}
+
+// HomeHandler: Welcome Message GET /
+func HomeHandler(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        fmt.Fprintln(w, "👋 Welcome to SnapCrumb! Shorten your links in a snap.")
+}</span>
+
+// ShortenURLHandler: Shorten a URL POST /shorten
+func ShortenURLHandler(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        fmt.Fprintln(w, "📦 SnapCrumb: Received a request to shorten a URL.")
+
+        // Parse the incoming JSON body
+        var req shortenRequest
+        err := json.NewDecoder(r.Body).Decode(&amp;req)
+        if err != nil || req.URL == "" </span><span class="cov0" title="0">{
+                http.Error(w, "Invalid request body", http.StatusBadRequest)
+                return
+        }</span>
+
+        // Validate the input (Make sure the URL is valid)
+        <span class="cov0" title="0">if !strings.HasPrefix(req.URL, "http://") &amp;&amp; !strings.HasPrefix(req.URL, "https://") </span><span class="cov0" title="0">{
+                http.Error(w, "Invalid URL format", http.StatusBadRequest)
+                return
+        }</span>
+
+        // Generate a unique shortcode (Using Randome String Generator)
+        <span class="cov0" title="0">shortcode := utils.GenerateShortCode(6)
+
+        // Store the URL in the database
+        err = db.InsertURL(req.URL, shortcode)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Failed to store URL in database", http.StatusInternalServerError)
+                return
+        }</span>
+
+        // Create the shortened URL
+        <span class="cov0" title="0">domain := "http://localhost:8080"
+        shortened := domain + "/" + shortcode
+
+        // Return the shortened URL
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(shortenResponse{
+                Shortcode:    shortcode,
+                ShortenedURL: shortened,
+        })</span>
+}
+
+// RedirectHandler: Redirect to original URL GET /{shortcode}
+func RedirectHandler(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        vars := mux.Vars(r)
+        shortcode := vars["shortcode"]
+
+        originalURL, err := db.GetOriginalURLByShortcode(shortcode)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintln(w, "Error: ", err)
+                http.Error(w, "Server error", http.StatusInternalServerError)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if originalURL == "" </span><span class="cov0" title="0">{
+                http.Error(w, "Shortcode not found", http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov0" title="0">http.Redirect(w, r, originalURL, http.StatusSeeOther)</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package db
+
+import (
+        "database/sql"
+        "log"
+
+        _ "github.com/lib/pq" // PostgreSQL driver
+)
+
+// DB Instance
+var DB *sql.DB
+
+// Initialize DB
+func InitDB(connStr string) <span class="cov8" title="1">{
+        var err error
+        DB, err = sql.Open("postgres", connStr)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("❌ Failed to connect to database: %v", err)
+        }</span>
+
+        <span class="cov8" title="1">err = DB.Ping()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("❌ Failed to ping database: %v", err)
+        }</span>
+
+        <span class="cov8" title="1">log.Println("✅ Successfully connected to the database")</span>
+}
+
+// InsertURL: Insert a new URL into the database
+//   - Todo: If Insert fails with a unique_violation error,
+//     generate a new shortcode and retry.
+func InsertURL(originalURL, shortcode string) error <span class="cov8" title="1">{
+        query := `
+                INSERT INTO urls (original_url, shortcode)
+                VALUES ($1, $2)
+        `
+        _, err := DB.Exec(query, originalURL, shortcode)
+        return err
+}</span>
+
+func GetOriginalURLByShortcode(shortcode string) (string, error) <span class="cov8" title="1">{
+        var originalURL string
+        query := "SELECT original_url FROM urls WHERE shortcode = $1;"
+        err := DB.QueryRow(query, shortcode).Scan(&amp;originalURL)
+        if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                return "", nil
+        }</span>
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return originalURL, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package utils
+
+import (
+        "math/rand"
+        "strings"
+        "time"
+)
+
+// generateShortCode: Generate a random shortcode
+func GenerateShortCode(length int) string <span class="cov8" title="1">{
+        // rand.Seed(time.Now().UnixNano())
+        rando := rand.New(rand.NewSource(time.Now().UnixNano()))
+        chars := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        var b strings.Builder
+        for i := 0; i &lt; length; i++ </span><span class="cov8" title="1">{
+                b.WriteRune(chars[rando.Intn(len(chars))])
+        }</span>
+
+        <span class="cov8" title="1">return b.String()</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

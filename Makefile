@@ -47,3 +47,15 @@ migrate:
 	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose force 1 || true
 	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose up
 
+# Run tests with coverage and save to coverage.out
+coverage:
+	go test ./... --coverprofile=coverage.out
+
+# Show coverage % from coverage.out
+coverage-show: coverage
+	go tool cover -func=coverage.out
+
+# View HTML coverage report
+coverage-html: coverage
+	go tool cover -html=coverage.out -o coverage.html
+	open coverage.html

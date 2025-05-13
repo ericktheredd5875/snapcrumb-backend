@@ -60,6 +60,12 @@ jobs:
                 sudo mv migrate /usr/local/bin/
 
             - name: Run Tests via Makefile
-              run: make test
-              
+              run: make coverage-show
+
+            - name: Upload Coverage
+              uses: codecov/codecov-action@v4
+              with:
+                file: coverage.out
+                token: ${{ secrets.CODECOV_TOKEN }}
+                flags: unittests
               
