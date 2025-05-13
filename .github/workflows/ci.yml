@@ -26,7 +26,9 @@ jobs:
                     --health-retries 5
 
         env:
-            POSTGRES_URL: "postgres://snapcrumb:snapcrumb@localhost:5432/snapcrumb_test?sslmode=disable"
+            URL: localhost
+            PORT: 8080
+            DATABASE_URL: "postgres://snapcrumb:snapcrumb@localhost:5432/snapcrumb_test?sslmode=disable"
         steps:
             - name: Checkout Code
               uses: actions/checkout@v4
