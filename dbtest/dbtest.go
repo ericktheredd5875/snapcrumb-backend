@@ -9,22 +9,23 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var TestDB *sql.DB
+// TestDB is the shared test database connection
+var testDB *sql.DB
 
-func Setup(m *testing.M) int {
+func SetupDB(m *testing.M) int {
 	dsn := os.Getenv("POSTGRES_URL")
 	if dsn == "" {
 		dsn = "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
 	}
 
 	var err error
-	TestDB, err = sql.Open("postgres", dsn)
+	testDB, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatalf("Failed to connect to test db: %v", err)
 	}
 	log.Println("Connected to test db")
 
-	if err := TestDB.Ping(); err != nil {
+	if err := testDB.Ping(); err != nil {
 		log.Fatalf("Failed to ping test db: %v", err)
 	}
 	log.Println("Pinged test db")
@@ -48,12 +49,12 @@ func resetSchema() error {
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)
 	`
-	_, err := TestDB.Exec(schema)
+	_, err := testDB.Exec(schema)
 	return err
 }
 
 func CleanDB(t *testing.T) {
-	_, err := TestDB.Exec("TRUNCATE TABLE urls RESTART IDENTITY CASCADE;")
+	_, err := testDB.Exec("TRUNCATE TABLE urls RESTART IDENTITY CASCADE;")
 	if err != nil {
 		t.Fatalf("Failed to truncate test db: %v", err)
 	}

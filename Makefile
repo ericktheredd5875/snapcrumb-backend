@@ -29,6 +29,11 @@ run:
 test:
 	go test ./...
 
+test-reset:
+	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose down
+	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose up
+	go test ./...
+
 # Clean the build binary
 clean: 
 	rm -rf bin tmp
@@ -36,3 +41,9 @@ clean:
 # Run dev server with auto-reload
 dev:
 	air -c .air.toml
+
+# export DATABASE_URL="postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
+migrate:
+	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose force 1 || true
+	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose up
+

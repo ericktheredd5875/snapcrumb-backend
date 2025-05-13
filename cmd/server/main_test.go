@@ -10,5 +10,5 @@ import (
 
 func TestMain(m *testing.M) {
 	log.Println("Running Main Test")
-	os.Exit(dbtest.Setup(m))
+	os.Exit(dbtest.SetupDB(m))
 }
