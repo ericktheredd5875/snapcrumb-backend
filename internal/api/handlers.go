@@ -56,8 +56,8 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the shortened URL
-	url := utils.RequiredEnv("URL")
-	port := utils.RequiredEnv("PORT")
+	url := utils.ObtainEnv("URL", "localhost")
+	port := utils.ObtainEnv("PORT", "8080")
 	shortened := url + ":" + port + "/" + shortcode
 
 	// Return the shortened URL

@@ -3,7 +3,27 @@ package utils
 import (
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
+
+func init() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("ℹ️ .env file not found")
+	}
+}
+
+// ObtainEnv: Get an environment variable with a fallback
+func ObtainEnv(key string, fallback string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		return fallback
+	}
+
+	return val
+}
 
 // RequiredEnv: Check if required environment variables are set
 func RequiredEnv(key string) string {

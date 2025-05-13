@@ -1,11 +1,8 @@
 package db
 
 import (
-	"log"
 	"os"
 	"testing"
-
-	"github.com/joho/godotenv"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 )
@@ -14,11 +11,6 @@ import (
 func TestMain(m *testing.M) {
 
 	// Load environment variables
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Println("ℹ️ .env file not found")
-	}
-
 	dsn := utils.RequiredEnv("DATABASE_URL")
 	InitDB(dsn)
 

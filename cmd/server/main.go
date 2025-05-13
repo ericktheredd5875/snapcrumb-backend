@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/api"
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
@@ -15,12 +14,7 @@ import (
 func main() {
 
 	// Load environment variables
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("ℹ️ .env file not found")
-	}
-
-	port := utils.RequiredEnv("PORT")
+	port := utils.ObtainEnv("PORT", "8080")
 	dbURL := utils.RequiredEnv("DATABASE_URL")
 
 	// Initialize Router
@@ -39,7 +33,7 @@ func main() {
 	db.InitDB(dbURL)
 
 	log.Printf("🚀 SnapCrumb server starting on port %s...", port)
-	err = http.ListenAndServe(":"+port, router)
+	err := http.ListenAndServe(":"+port, router)
 	if err != nil {
 		log.Fatalf("🚨 Failed to start server: %v", err)
 	}

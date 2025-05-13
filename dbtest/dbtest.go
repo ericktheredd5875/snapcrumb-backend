@@ -5,7 +5,6 @@ import (
 	"log"
 	"testing"
 
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
@@ -19,11 +18,6 @@ func SetupDB(m *testing.M) int {
 	var err error
 
 	// Load environment variables
-	err = godotenv.Load("../.env")
-	if err != nil {
-		log.Println("ℹ️ .env file not found")
-	}
-
 	dsn := utils.RequiredEnv("DATABASE_URL")
 
 	testDB, err = sql.Open("postgres", dsn)
