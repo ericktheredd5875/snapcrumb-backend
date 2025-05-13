@@ -12,7 +12,7 @@ endif
 BINARY=bin/$(APP_NAME)$(BINARY_EXT)
 
 ifneq (,$(wildcard .env))
-	include .env
+	-include .env
 	export
 endif
 

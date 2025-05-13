@@ -16,7 +16,7 @@ func TestMain(m *testing.M) {
 	// Load environment variables
 	err := godotenv.Load("../../.env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("ℹ️ .env file not found")
 	}
 
 	dsn := utils.RequiredEnv("DATABASE_URL")
