@@ -5,12 +5,23 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/api"
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
+	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 )
 
 func main() {
+
+	// Load environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	port := utils.RequiredEnv("PORT")
+	dbURL := utils.RequiredEnv("DATABASE_URL")
 
 	// Initialize Router
 	router := mux.NewRouter()
@@ -25,11 +36,10 @@ func main() {
 	router.HandleFunc("/{shortcode}", api.RedirectHandler).Methods("GET")
 
 	// Initialize DB
-	db.InitDB("postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb?sslmode=disable")
+	db.InitDB(dbURL)
 
-	port := "8080"
 	log.Printf("🚀 SnapCrumb server starting on port %s...", port)
-	err := http.ListenAndServe(":"+port, router)
+	err = http.ListenAndServe(":"+port, router)
 	if err != nil {
 		log.Fatalf("🚨 Failed to start server: %v", err)
 	}

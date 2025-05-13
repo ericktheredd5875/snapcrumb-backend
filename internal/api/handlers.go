@@ -56,8 +56,9 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the shortened URL
-	domain := "http://localhost:8080"
-	shortened := domain + "/" + shortcode
+	url := utils.RequiredEnv("URL")
+	port := utils.RequiredEnv("PORT")
+	shortened := url + ":" + port + "/" + shortcode
 
 	// Return the shortened URL
 	w.Header().Set("Content-Type", "application/json")

@@ -1,17 +1,25 @@
 package db
 
 import (
+	"log"
 	"os"
 	"testing"
+
+	"github.com/joho/godotenv"
+
+	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 )
 
 // Connects to test DB
 func TestMain(m *testing.M) {
 
-	dsn := os.Getenv("POSTGRES_URL")
-	if dsn == "" {
-		dsn = "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
+	// Load environment variables
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
+
+	dsn := utils.RequiredEnv("DATABASE_URL")
 	InitDB(dsn)
 
 	code := m.Run()

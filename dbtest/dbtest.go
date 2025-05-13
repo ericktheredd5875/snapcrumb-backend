@@ -3,22 +3,29 @@ package dbtest
 import (
 	"database/sql"
 	"log"
-	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+
+	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 )
 
 // TestDB is the shared test database connection
 var testDB *sql.DB
 
 func SetupDB(m *testing.M) int {
-	dsn := os.Getenv("POSTGRES_URL")
-	if dsn == "" {
-		dsn = "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
-	}
 
 	var err error
+
+	// Load environment variables
+	err = godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	dsn := utils.RequiredEnv("DATABASE_URL")
+
 	testDB, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatalf("Failed to connect to test db: %v", err)

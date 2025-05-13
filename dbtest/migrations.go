@@ -4,25 +4,32 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
+	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 )
 
 var TestDB *sql.DB
 
 func Setup(m *testing.M) int {
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
-		dsn = "postgres://postgres:2b4gp44g6wr607931@localhost:5432/snapcrumb_test?sslmode=disable"
-	}
 
 	var err error
+
+	// Load environment variables
+	err = godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	dsn := utils.RequiredEnv("DATABASE_URL")
+
 	TestDB, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatalf("failed to connect to test db: %v", err)
