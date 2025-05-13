@@ -7,7 +7,7 @@ Built with modern backend practices, Dockerized for easy deployment, and ready f
 
 ---
 
-![Coverage](https://codecov.io/gh/yourusername/snapcrumb/branch/main/graph/badge.svg)
+[![codecov](https://codecov.io/gh/ericktheredd5875/snapcrumb-backend/graph/badge.svg?token=T0T34K27RD)](https://codecov.io/gh/ericktheredd5875/snapcrumb-backend)
 
 ---
 
