@@ -60,6 +60,6 @@ jobs:
                 sudo mv migrate /usr/local/bin/
 
             - name: Run Tests via Makefile
-              run: make test-reset
+              run: make test
               
               
