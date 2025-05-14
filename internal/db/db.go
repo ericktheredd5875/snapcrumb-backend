@@ -24,6 +24,8 @@ func InitDB(connStr string) {
 	}
 
 	log.Println("✅ Successfully connected to the database")
+
+	RunMigrations(DB)
 }
 
 // InsertURL: Insert a new URL into the database
