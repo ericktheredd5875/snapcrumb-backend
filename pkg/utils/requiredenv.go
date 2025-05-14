@@ -9,10 +9,13 @@ import (
 
 func init() {
 
+	// err := godotenv.Load("C:/CodeBases/snapcrumb-backend/.env")
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("ℹ️ .env file not found")
 	}
+
+	log.Println("🔑 Environment variables loaded")
 }
 
 // ObtainEnv: Get an environment variable with a fallback

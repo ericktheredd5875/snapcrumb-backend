@@ -28,6 +28,7 @@ jobs:
         env:
             URL: localhost
             PORT: 8080
+            MIGRATION_PATH: ./db/migrations
             DATABASE_URL: "postgres://snapcrumb:snapcrumb@localhost:5432/snapcrumb?sslmode=disable"
             TEST_DATABASE_URL: "postgres://snapcrumb:snapcrumb@localhost:5432/snapcrumb_test?sslmode=disable"
         steps:
