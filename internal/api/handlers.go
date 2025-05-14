@@ -3,12 +3,13 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
 	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 // Request Body struct
@@ -70,15 +71,23 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 
 // RedirectHandler: Redirect to original URL GET /{shortcode}
 func RedirectHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	shortcode := vars["shortcode"]
+
+	shortcode := chi.URLParam(r, "shortcode")
+	log.Printf("Shortcode: %s", shortcode)
+
+	if shortcode == "" {
+		http.Error(w, "Shortcode missing", http.StatusBadRequest)
+		return
+	}
 
 	originalURL, err := db.GetOriginalURLByShortcode(shortcode)
 	if err != nil {
-		fmt.Fprintln(w, "Error: ", err)
+		log.Printf("Error: %v", err)
 		http.Error(w, "Server error", http.StatusInternalServerError)
 		return
 	}
+
+	log.Printf("Original URL: %s", originalURL)
 
 	if originalURL == "" {
 		http.Error(w, "Shortcode not found", http.StatusNotFound)

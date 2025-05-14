@@ -47,7 +47,7 @@ clean:
 dev:
 	air -c .air.toml
 
-
+# migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose force 1 || true
 migrate:
 	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose down
 	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose up
