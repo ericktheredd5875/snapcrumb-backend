@@ -64,3 +64,8 @@ coverage-show: coverage
 coverage-html: coverage
 	go tool cover -html=coverage.out -o coverage.html
 	open coverage.html
+
+# Run on Render
+render: 
+	migrate
+	./snapcrumb
