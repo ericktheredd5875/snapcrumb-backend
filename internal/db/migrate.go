@@ -29,6 +29,12 @@ func RunMigrations(db *sql.DB) {
 	if err != nil && err != migrate.ErrNoChange {
 		log.Fatalf("failed to run migrations: %v", err)
 	}
-
-	fmt.Println("Migrations applied successfully")
+	switch err {
+	case nil:
+		fmt.Println("✅ Migrations applied successfully.")
+	case migrate.ErrNoChange:
+		fmt.Println("🟡 No migrations to apply.")
+	default:
+		log.Fatalf("❌ Failed to apply migrations: %v", err)
+	}
 }

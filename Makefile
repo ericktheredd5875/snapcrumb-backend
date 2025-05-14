@@ -35,8 +35,8 @@ test:
 	go test ./...
 
 test-reset:
-	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose down
-	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose up
+	migrate -path ./db/migrations -database "$(TEST_DATABASE_URL)" -verbose down
+	migrate -path ./db/migrations -database "$(TEST_DATABASE_URL)" -verbose up
 	go test ./...
 
 # Clean the build binary
@@ -49,7 +49,7 @@ dev:
 
 
 migrate:
-	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose force 1 || true
+	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose down
 	migrate -path ./db/migrations -database "$(DATABASE_URL)" -verbose up
 
 # Run tests with coverage and save to coverage.out
