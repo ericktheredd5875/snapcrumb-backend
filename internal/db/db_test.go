@@ -11,7 +11,7 @@ import (
 func TestMain(m *testing.M) {
 
 	// Load environment variables
-	dsn := utils.RequiredEnv("DATABASE_URL")
+	dsn := utils.RequiredEnv("TEST_DATABASE_URL")
 	InitDB(dsn)
 
 	code := m.Run()

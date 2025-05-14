@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
 	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 )
 
@@ -18,7 +19,7 @@ func SetupDB(m *testing.M) int {
 	var err error
 
 	// Load environment variables
-	dsn := utils.RequiredEnv("DATABASE_URL")
+	dsn := utils.RequiredEnv("TEST_DATABASE_URL")
 
 	testDB, err = sql.Open("postgres", dsn)
 	if err != nil {
@@ -30,6 +31,9 @@ func SetupDB(m *testing.M) int {
 		log.Fatalf("Failed to ping test db: %v", err)
 	}
 	log.Println("Pinged test db")
+
+	// Run migrations
+	db.RunMigrations(testDB)
 
 	if err := resetSchema(); err != nil {
 		log.Fatalf("Failed to reset schema: %v", err)
