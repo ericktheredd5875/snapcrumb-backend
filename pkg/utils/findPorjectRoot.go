@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+// FindProjectRoot: Find the root directory of the project
 func FindProjectRoot(startDir string) (string, error) {
 
 	var err error

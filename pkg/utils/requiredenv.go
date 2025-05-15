@@ -11,7 +11,6 @@ import (
 
 func init() {
 
-	// err := godotenv.Load("C:/CodeBases/snapcrumb-backend/.env")
 	envFile := ""
 	if IsTestEnv() {
 
@@ -21,16 +20,10 @@ func init() {
 		}
 
 		envFile = filepath.Join(root, ".env.test")
-		log.Println("ℹ️ APP_ENV is not set, using .env.test")
+		// log.Println("ℹ️ APP_ENV is not set, using .env.test")
 	} else {
 		envFile = ".env.dev"
 	}
-
-	// envFile := ""
-	// if appEnv == "" {
-	// 	envFile = "C:/CodeBases/snapcrumb-backend/.env.test"
-	// 	log.Println("ℹ️ APP_ENV is not set, using .env.test")
-	// }
 
 	err := godotenv.Load(envFile)
 	if err != nil {
@@ -38,8 +31,8 @@ func init() {
 	}
 
 	// log.Println("🔑 Environment variables loaded from", appEnv)
-	appEnv := os.Getenv("APP_ENV")
-	log.Println("🔑 APP_ENV:", appEnv)
+	// appEnv := os.Getenv("APP_ENV")
+	// log.Println("🔑 APP_ENV:", appEnv)
 }
 
 // ObtainEnv: Get an environment variable with a fallback

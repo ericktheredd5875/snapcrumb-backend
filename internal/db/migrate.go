@@ -14,18 +14,18 @@ import (
 
 func GetMigrationsPath() (string, error) {
 
-	path, _ := filepath.Abs(".")
-	log.Printf("Abs Path: %s", path)
+	// path, _ := filepath.Abs(".")
+	// log.Printf("Abs Path: %s", path)
 
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", fmt.Errorf("failed to get working directory: %v", err)
 	}
-	log.Printf("Working Directory: %s", wd)
+	// log.Printf("Working Directory: %s", wd)
 	// return "", nil
 
 	if envPath := os.Getenv("MIGRATION_PATH"); envPath != "" {
-		log.Printf("[1]📦 Using migrations from: %s", envPath)
+		// log.Printf("[1]📦 Using migrations from: %s", envPath)
 		return "file://" + filepath.ToSlash(envPath), nil
 	}
 
@@ -38,7 +38,7 @@ func GetMigrationsPath() (string, error) {
 	rootPath := filepath.Join(wd, "..", "..")
 	migrationPath := filepath.Join(rootPath, "db", "migrations")
 	migrationPath = filepath.ToSlash(migrationPath)
-	log.Printf("[2]📦 Using migrations from: %s", migrationPath)
+	// log.Printf("[2]📦 Using migrations from: %s", migrationPath)
 	// return fmt.Sprintf("file://%s", migrationPath), nil
 	return "file://" + migrationPath, nil
 }
@@ -53,7 +53,7 @@ func RunMigrations(db *sql.DB) {
 	if err != nil {
 		log.Fatalf("failed to get migrations path: %v", err)
 	}
-	log.Printf("📦 Using migrations from: %s", srcUrl)
+	// log.Printf("📦 Using migrations from: %s", srcUrl)
 
 	m, err := migrate.NewWithDatabaseInstance(
 		srcUrl,
@@ -70,9 +70,9 @@ func RunMigrations(db *sql.DB) {
 	}
 	switch err {
 	case nil:
-		fmt.Println("✅ Migrations applied successfully.")
+		log.Printf("✅ Migrations applied successfully.")
 	case migrate.ErrNoChange:
-		fmt.Println("🟡 No migrations to apply.")
+		log.Printf("🟡 No migrations to apply.")
 	default:
 		log.Fatalf("❌ Failed to apply migrations: %v", err)
 	}
