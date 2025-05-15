@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,8 +16,8 @@ import (
 
 // Request Body struct
 type shortenRequest struct {
-	URL       string    `json:"url"`
-	ExpiresAt time.Time `json:"expires_at,omitempty"`
+	URL       string     `json:"url"`
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 }
 
 // Response Body struct
@@ -32,19 +33,19 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 // ShortenURLHandler: Shorten a URL POST /shorten
 func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "📦 SnapCrumb: Received a request to shorten a URL.")
+	log.Println("📦 SnapCrumb: Received a request to shorten a URL.")
 
 	// Parse the incoming JSON body
 	var req shortenRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil || req.URL == "" {
+	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	// Validate the input (Make sure the URL is valid)
-	if !strings.HasPrefix(req.URL, "http://") && !strings.HasPrefix(req.URL, "https://") {
-		http.Error(w, "Invalid URL format", http.StatusBadRequest)
+	if err := validateShortenInput(req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -52,7 +53,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	shortcode := utils.GenerateShortCode(6)
 
 	// Store the URL in the database
-	err = db.InsertURL(req.URL, shortcode, &req.ExpiresAt)
+	err = db.InsertURL(req.URL, shortcode, req.ExpiresAt)
 	if err != nil {
 		http.Error(w, "Failed to store URL in database", http.StatusInternalServerError)
 		return
@@ -131,4 +132,20 @@ func StatsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
+}
+
+func validateShortenInput(req shortenRequest) error {
+	if req.URL == "" {
+		return errors.New("URL is required")
+	}
+
+	if !strings.HasPrefix(req.URL, "http://") && !strings.HasPrefix(req.URL, "https://") {
+		return errors.New("URL must start with http:// or https://")
+	}
+
+	if req.ExpiresAt != nil && time.Now().After(*req.ExpiresAt) {
+		return errors.New("expires_at cannot be in the past")
+	}
+
+	return nil
 }
