@@ -94,7 +94,7 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.LogVisit(db.DB, shortcode, r.RemoteAddr, r.UserAgent())
+	db.LogVisit(db.DB, shortcode, r.RemoteAddr, r.UserAgent(), r.Referer())
 
 	http.Redirect(w, r, originalURL, http.StatusSeeOther)
 }

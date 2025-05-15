@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-func LogVisit(db *sql.DB, shortcode string, ip string, userAgent string) error {
+func LogVisit(db *sql.DB, shortcode string, ip string, userAgent string, referer string) error {
 	query := `
-		INSERT INTO url_visits (shortcode, visited_at, ip_address, user_agent)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO url_visits (shortcode, visited_at, ip_address, user_agent, referer)
+		VALUES ($1, $2, $3, $4, $5)
 	`
 
-	_, err := db.Exec(query, shortcode, time.Now(), ip, userAgent)
+	_, err := db.Exec(query, shortcode, time.Now(), ip, userAgent, referer)
 	return err
 }
 
