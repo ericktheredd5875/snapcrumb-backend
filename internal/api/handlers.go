@@ -94,5 +94,26 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	db.LogVisit(db.DB, shortcode, r.RemoteAddr, r.UserAgent())
+
 	http.Redirect(w, r, originalURL, http.StatusSeeOther)
+}
+
+func StatsHandler(w http.ResponseWriter, r *http.Request) {
+	shortcode := chi.URLParam(r, "shortcode")
+
+	count, lastVisit, err := db.GetStats(db.DB, shortcode)
+	if err != nil {
+		http.Error(w, "Server error", http.StatusInternalServerError)
+		return
+	}
+
+	stats := map[string]interface{}{
+		"shortcode":     shortcode,
+		"visit_count":   count,
+		"last_visit_at": lastVisit.Time,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(stats)
 }

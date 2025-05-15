@@ -3,6 +3,8 @@ package utils
 import (
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -10,12 +12,34 @@ import (
 func init() {
 
 	// err := godotenv.Load("C:/CodeBases/snapcrumb-backend/.env")
-	err := godotenv.Load()
+	envFile := ""
+	if IsTestEnv() {
+
+		root, err := FindProjectRoot("")
+		if err != nil {
+			log.Fatalf("failed to find project root: %v", err)
+		}
+
+		envFile = filepath.Join(root, ".env.test")
+		log.Println("ℹ️ APP_ENV is not set, using .env.test")
+	} else {
+		envFile = ".env.dev"
+	}
+
+	// envFile := ""
+	// if appEnv == "" {
+	// 	envFile = "C:/CodeBases/snapcrumb-backend/.env.test"
+	// 	log.Println("ℹ️ APP_ENV is not set, using .env.test")
+	// }
+
+	err := godotenv.Load(envFile)
 	if err != nil {
 		log.Println("ℹ️ .env file not found")
 	}
 
-	log.Println("🔑 Environment variables loaded")
+	// log.Println("🔑 Environment variables loaded from", appEnv)
+	appEnv := os.Getenv("APP_ENV")
+	log.Println("🔑 APP_ENV:", appEnv)
 }
 
 // ObtainEnv: Get an environment variable with a fallback
@@ -36,4 +60,16 @@ func RequiredEnv(key string) string {
 	}
 
 	return val
+}
+
+func IsTestEnv() bool {
+	is := false
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test.") {
+			is = true
+			break
+		}
+	}
+
+	return is
 }

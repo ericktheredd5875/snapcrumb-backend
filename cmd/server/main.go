@@ -35,6 +35,8 @@ func main() {
 	// GET: Redirect to original URL (shortcode param)
 	r.Get("/{shortcode}", api.RedirectHandler)
 
+	r.Get("/stats/{shortcode}", api.StatsHandler)
+
 	// Initialize DB
 	db.InitDB(dbURL)
 

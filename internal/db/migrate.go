@@ -14,19 +14,31 @@ import (
 
 func GetMigrationsPath() (string, error) {
 
-	if envPath := os.Getenv("MIGRATION_PATH"); envPath != "" {
-		log.Printf("[1]📦 Using migrations from: %s", envPath)
-		return "file://" + filepath.ToSlash(envPath), nil
-	}
+	path, _ := filepath.Abs(".")
+	log.Printf("Abs Path: %s", path)
 
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", fmt.Errorf("failed to get working directory: %v", err)
 	}
+	log.Printf("Working Directory: %s", wd)
+	// return "", nil
+
+	if envPath := os.Getenv("MIGRATION_PATH"); envPath != "" {
+		log.Printf("[1]📦 Using migrations from: %s", envPath)
+		return "file://" + filepath.ToSlash(envPath), nil
+	}
+
+	// wd, err := os.Getwd()
+	// if err != nil {
+	// 	return "", fmt.Errorf("failed to get working directory: %v", err)
+	// }
+	// log.Printf("Working Directory: %s", wd)
 
 	rootPath := filepath.Join(wd, "..", "..")
 	migrationPath := filepath.Join(rootPath, "db", "migrations")
 	migrationPath = filepath.ToSlash(migrationPath)
+	log.Printf("[2]📦 Using migrations from: %s", migrationPath)
 	// return fmt.Sprintf("file://%s", migrationPath), nil
 	return "file://" + migrationPath, nil
 }
