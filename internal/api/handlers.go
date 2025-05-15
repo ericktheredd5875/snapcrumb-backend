@@ -2,23 +2,15 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
 	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
 	"github.com/go-chi/chi/v5"
 )
-
-// Request Body struct
-type shortenRequest struct {
-	URL       string     `json:"url"`
-	ExpiresAt *time.Time `json:"expires_at,omitempty"`
-}
 
 // Response Body struct
 type shortenResponse struct {
@@ -36,7 +28,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("📦 SnapCrumb: Received a request to shorten a URL.")
 
 	// Parse the incoming JSON body
-	var req shortenRequest
+	var req utils.ShortenRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -44,7 +36,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate the input (Make sure the URL is valid)
-	if err := validateShortenInput(req); err != nil {
+	if err := utils.ValidateShortenInput(req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -132,20 +124,4 @@ func StatsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
-}
-
-func validateShortenInput(req shortenRequest) error {
-	if req.URL == "" {
-		return errors.New("URL is required")
-	}
-
-	if !strings.HasPrefix(req.URL, "http://") && !strings.HasPrefix(req.URL, "https://") {
-		return errors.New("URL must start with http:// or https://")
-	}
-
-	if req.ExpiresAt != nil && time.Now().After(*req.ExpiresAt) {
-		return errors.New("expires_at cannot be in the past")
-	}
-
-	return nil
 }
