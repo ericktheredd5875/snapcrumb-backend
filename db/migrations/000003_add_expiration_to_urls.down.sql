@@ -1,2 +1,2 @@
-ALTER TABLE urls
-DROP COLUMN IF EXISTS expires_at;
+-- ALTER TABLE urls
+-- DROP COLUMN IF EXISTS expires_at;

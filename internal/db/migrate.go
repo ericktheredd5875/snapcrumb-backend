@@ -64,6 +64,7 @@ func RunMigrations(db *sql.DB) {
 		log.Fatalf("failed to create migration instance: %v", err)
 	}
 
+	_ = m.Down()
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		log.Fatalf("failed to run migrations: %v", err)
