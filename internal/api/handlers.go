@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/ericktheredd5875/snapcrumb-backend/internal/db"
 	"github.com/ericktheredd5875/snapcrumb-backend/pkg/utils"
@@ -14,7 +15,8 @@ import (
 
 // Request Body struct
 type shortenRequest struct {
-	URL string `json:"url"`
+	URL       string    `json:"url"`
+	ExpiresAt time.Time `json:"expires_at,omitempty"`
 }
 
 // Response Body struct
@@ -50,7 +52,7 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	shortcode := utils.GenerateShortCode(6)
 
 	// Store the URL in the database
-	err = db.InsertURL(req.URL, shortcode)
+	err = db.InsertURL(req.URL, shortcode, &req.ExpiresAt)
 	if err != nil {
 		http.Error(w, "Failed to store URL in database", http.StatusInternalServerError)
 		return
@@ -80,10 +82,15 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	originalURL, err := db.GetOriginalURLByShortcode(shortcode)
+	originalURL, expiresAt, err := db.GetOriginalURLByShortcode(shortcode)
 	if err != nil {
 		log.Printf("Error: %v", err)
 		http.Error(w, "Server error", http.StatusInternalServerError)
+		return
+	}
+
+	if !expiresAt.IsZero() && time.Now().After(expiresAt) {
+		http.Error(w, "URL expired", http.StatusGone)
 		return
 	}
 
@@ -94,7 +101,7 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.LogVisit(db.DB, shortcode, r.RemoteAddr, r.UserAgent(), r.Referer())
+	db.LogVisit(shortcode, r.RemoteAddr, r.UserAgent(), r.Referer())
 
 	http.Redirect(w, r, originalURL, http.StatusSeeOther)
 }
@@ -102,7 +109,13 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 func StatsHandler(w http.ResponseWriter, r *http.Request) {
 	shortcode := chi.URLParam(r, "shortcode")
 
-	count, lastVisit, err := db.GetStats(db.DB, shortcode)
+	count, lastVisit, err := db.GetStats(shortcode)
+	if err != nil {
+		http.Error(w, "Server error", http.StatusInternalServerError)
+		return
+	}
+
+	originalURL, expiresAt, err := db.GetOriginalURLByShortcode(shortcode)
 	if err != nil {
 		http.Error(w, "Server error", http.StatusInternalServerError)
 		return
@@ -112,6 +125,8 @@ func StatsHandler(w http.ResponseWriter, r *http.Request) {
 		"shortcode":     shortcode,
 		"visit_count":   count,
 		"last_visit_at": lastVisit.Time,
+		"expires_at":    expiresAt,
+		"original_url":  originalURL,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

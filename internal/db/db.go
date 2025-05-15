@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
@@ -31,25 +32,30 @@ func InitDB(connStr string) {
 // InsertURL: Insert a new URL into the database
 //   - Todo: If Insert fails with a unique_violation error,
 //     generate a new shortcode and retry.
-func InsertURL(originalURL, shortcode string) error {
+func InsertURL(originalURL string, shortcode string, expiresAt *time.Time) error {
 	query := `
-		INSERT INTO urls (original_url, shortcode)
-		VALUES ($1, $2)
+		INSERT INTO urls (original_url, shortcode, expires_at)
+		VALUES ($1, $2, $3)
 	`
-	_, err := DB.Exec(query, originalURL, shortcode)
+	_, err := DB.Exec(query, originalURL, shortcode, expiresAt)
 	return err
 }
 
-func GetOriginalURLByShortcode(shortcode string) (string, error) {
+func GetOriginalURLByShortcode(shortcode string) (string, time.Time, error) {
 	var originalURL string
-	query := "SELECT original_url FROM urls WHERE shortcode = $1;"
-	err := DB.QueryRow(query, shortcode).Scan(&originalURL)
+	var expiresAt sql.NullTime
+	query := `
+		SELECT original_url, expires_at 
+			FROM urls WHERE shortcode = $1;
+	`
+
+	err := DB.QueryRow(query, shortcode).Scan(&originalURL, &expiresAt)
 	if err == sql.ErrNoRows {
-		return "", nil
+		return "", time.Time{}, nil
 	}
 	if err != nil {
-		return "", err
+		return "", time.Time{}, err
 	}
 
-	return originalURL, nil
+	return originalURL, expiresAt.Time, nil
 }
