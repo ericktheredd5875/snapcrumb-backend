@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 	"time"
@@ -34,7 +33,6 @@ var disallowedURLs = []string{
 	"internal.company",
 	"malware.com",
 	"phishing.com",
-	"example.com",
 }
 
 func ValidateShortenInput(req ShortenRequest) error {
@@ -54,23 +52,18 @@ func ValidateURL(srcUrl string) error {
 
 	// Check if URL is empty
 	if srcUrl == "" {
-		// return errors.New("URL is required")
 		return ValidationError{"url", "url is required"}
 	}
 
 	// Check if URL starts with http:// or https://
 	if !strings.HasPrefix(srcUrl, "http://") && !strings.HasPrefix(srcUrl, "https://") {
-		// return errors.New("URL must start with http:// or https://")
 		return ValidationError{"url", "URL must start with http:// or https://"}
 	}
 
 	//  Maximum URL length check
 	if len(srcUrl) > maxURLLength {
-		// return errors.New("URL is too long")
 		return ValidationError{"url", "URL is too long"}
 	}
-
-	log.Printf("Length: %d", len(srcUrl))
 
 	// Disallowed URLs check
 	for _, disallowed := range disallowedURLs {
