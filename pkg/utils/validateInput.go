@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/url"
@@ -12,6 +11,15 @@ import (
 type ShortenRequest struct {
 	URL       string     `json:"url"`
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
+}
+
+type ValidationError struct {
+	Field   string
+	Message string
+}
+
+func (e ValidationError) Error() string {
+	return e.Message
 }
 
 var maxURLLength = 2000
@@ -36,7 +44,7 @@ func ValidateShortenInput(req ShortenRequest) error {
 	}
 
 	if req.ExpiresAt != nil && time.Now().After(*req.ExpiresAt) {
-		return errors.New("expires_at cannot be in the past")
+		return ValidationError{"expires_at", "expires_at must be in the future"}
 	}
 
 	return nil
@@ -46,17 +54,20 @@ func ValidateURL(srcUrl string) error {
 
 	// Check if URL is empty
 	if srcUrl == "" {
-		return errors.New("URL is required")
+		// return errors.New("URL is required")
+		return ValidationError{"url", "url is required"}
 	}
 
 	// Check if URL starts with http:// or https://
 	if !strings.HasPrefix(srcUrl, "http://") && !strings.HasPrefix(srcUrl, "https://") {
-		return errors.New("URL must start with http:// or https://")
+		// return errors.New("URL must start with http:// or https://")
+		return ValidationError{"url", "URL must start with http:// or https://"}
 	}
 
 	//  Maximum URL length check
 	if len(srcUrl) > maxURLLength {
-		return errors.New("URL is too long")
+		// return errors.New("URL is too long")
+		return ValidationError{"url", "URL is too long"}
 	}
 
 	log.Printf("Length: %d", len(srcUrl))
@@ -64,14 +75,14 @@ func ValidateURL(srcUrl string) error {
 	// Disallowed URLs check
 	for _, disallowed := range disallowedURLs {
 		if strings.Contains(srcUrl, disallowed) {
-			return fmt.Errorf("url domain '%s' is not allowed", disallowed)
+			return ValidationError{"url", fmt.Sprintf("url domain '%s' is not allowed", disallowed)}
 		}
 	}
 
 	// Validate URL format
 	_, err := url.Parse(srcUrl)
 	if err != nil {
-		return fmt.Errorf("invalid URL format: %w", err)
+		return ValidationError{"url", "invalid URL format"}
 	}
 
 	return nil

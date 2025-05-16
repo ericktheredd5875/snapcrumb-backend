@@ -29,15 +29,19 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse the incoming JSON body
 	var req utils.ShortenRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		WriteJsonError(w, http.StatusBadRequest, "Invalid request body", "")
 		return
 	}
 
 	// Validate the input (Make sure the URL is valid)
 	if err := utils.ValidateShortenInput(req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+
+		if vErr, ok := err.(utils.ValidationError); ok {
+			WriteJsonError(w, http.StatusUnprocessableEntity, vErr.Message, vErr.Field)
+		} else {
+			WriteJsonError(w, http.StatusBadRequest, err.Error(), "")
+		}
 		return
 	}
 
@@ -45,9 +49,8 @@ func ShortenURLHandler(w http.ResponseWriter, r *http.Request) {
 	shortcode := utils.GenerateShortCode(6)
 
 	// Store the URL in the database
-	err = db.InsertURL(req.URL, shortcode, req.ExpiresAt)
-	if err != nil {
-		http.Error(w, "Failed to store URL in database", http.StatusInternalServerError)
+	if err := db.InsertURL(req.URL, shortcode, req.ExpiresAt); err != nil {
+		WriteJsonError(w, http.StatusInternalServerError, "Failed to store URL in database", "")
 		return
 	}
 
@@ -71,26 +74,25 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Shortcode: %s", shortcode)
 
 	if shortcode == "" {
-		http.Error(w, "Shortcode missing", http.StatusBadRequest)
+		WriteJsonError(w, http.StatusBadRequest, "Shortcode missing", "")
 		return
 	}
 
 	originalURL, expiresAt, err := db.GetOriginalURLByShortcode(shortcode)
 	if err != nil {
-		log.Printf("Error: %v", err)
-		http.Error(w, "Server error", http.StatusInternalServerError)
+		WriteJsonError(w, http.StatusInternalServerError, "Server error", "")
 		return
 	}
 
 	if !expiresAt.IsZero() && time.Now().After(expiresAt) {
-		http.Error(w, "URL expired", http.StatusGone)
+		WriteJsonError(w, http.StatusGone, "URL expired", "")
 		return
 	}
 
 	log.Printf("Original URL: %s", originalURL)
 
 	if originalURL == "" {
-		http.Error(w, "Shortcode not found", http.StatusNotFound)
+		WriteJsonError(w, http.StatusNotFound, "Shortcode not found", "")
 		return
 	}
 
@@ -104,13 +106,13 @@ func StatsHandler(w http.ResponseWriter, r *http.Request) {
 
 	count, lastVisit, err := db.GetStats(shortcode)
 	if err != nil {
-		http.Error(w, "Server error", http.StatusInternalServerError)
+		WriteJsonError(w, http.StatusInternalServerError, "Server error", "")
 		return
 	}
 
 	originalURL, expiresAt, err := db.GetOriginalURLByShortcode(shortcode)
 	if err != nil {
-		http.Error(w, "Server error", http.StatusInternalServerError)
+		WriteJsonError(w, http.StatusInternalServerError, "Server error", "")
 		return
 	}
 
