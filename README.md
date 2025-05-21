@@ -1,126 +1,72 @@
-# 🚀 SnapCrumb
+# SnapCrumb – A Scalable URL Shortener in Go
 
-> **Shorten in a snap. Share your crumb trail.**  
+SnapCrumb is a lightweight, modular URL shortener built with Go and PostgreSQL. Designed for speed, simplicity, and scalability, it provides redirect tracking, stats logging, and a clean RESTful API—all built without external frameworks.
 
-SnapCrumb is a fast and lightweight URL shortening service designed for quick redirection and easy sharing.  
-Built with modern backend practices, Dockerized for easy deployment, and ready for cloud scaling.
+## 🚀 Features
+
+- ✅ Built entirely in Go (Golang)
+- 🗄️ PostgreSQL-based schema for link storage and tracking
+- 🔒 IP and click tracking (with future Redis caching planned)
+- 🧩 Middleware architecture using Chi router
+- 🧪 Unit-tested core packages
+- ♻️ Designed for extensibility (analytics, auth, etc.)
+
+## 📐 Architecture Overview
+
+- **Router**: Powered by [Chi](https://github.com/go-chi/chi), uses idiomatic middleware
+- **Handlers**: Each route has its own lightweight handler
+- **Storage**: Repository layer abstracts PostgreSQL
+- **Models**: Clean data model separation
+- **Stats**: Tracks hits, IPs, and redirect count (pluggable)
+
+```
+📦 cmd/
+├── server.go      # App entry point
+📚 internal/
+├── handler/       # Route handlers
+├── middleware/    # Custom middleware (logging, etc)
+├── model/         # URL model + validation
+├── repo/          # DB repository interface & PostgreSQL impl
+🧪 tests/
+├── handler_test.go, repo_test.go
+```
+
+## 🛠️ Getting Started
+
+```bash
+# Clone the repo
+git clone https://github.com/ericktheredd5875/snapcrumb.git && cd snapcrumb
+
+# Set up your environment
+cp .env.example .env
+
+# Run the app
+go run cmd/server.go
+```
+
+Make sure PostgreSQL is running and matches the credentials in `.env`.
+
+## 🧪 Running Tests
+
+```bash
+go test ./...
+```
+
+## 🔮 Roadmap
+
+- [ ] Redis-based analytics caching
+- [ ] URL expiration
+- [ ] User accounts + auth
+- [ ] Admin dashboard
+
+## 🙋‍♂️ About Me
+
+Hi, I'm [Eric Harris](https://github.com/ericktheredd5875) — a backend engineer passionate about building scalable systems. I built SnapCrumb to level up my Go/PostgreSQL skills and contribute a clean, practical project to my portfolio.
 
 ---
 
-[![codecov](https://codecov.io/gh/ericktheredd5875/snapcrumb-backend/graph/badge.svg?token=T0T34K27RD)](https://codecov.io/gh/ericktheredd5875/snapcrumb-backend)
+## 📬 Contact
 
----
-
-## 🛠️ Features
-
-- Shorten long URLs into small, easy-to-share links
-- Redirect users instantly via custom shortcodes
-- Track creation dates and (optionally) click counts
-- Designed for containerization (Docker)
-- Ready for cloud deployment (AWS, GCP, Azure)
-- Future-proof structure for scaling and monitoring
-
----
-
-## 📚 API Endpoints
-
-### 1. Create a Shortened URL
-
-**Request**
-
-POST /shorten Content-Type: application/json { "url": "https://www.example.com/some/very/long/path" }
-
-**Success Response**
-
-201 Created { "shortcode": "aBcD123", "shortened_url": "https://yourdomain.com/aBcD123" }
-
----
-
-### 2. Redirect to Original URL
-
-**Request**
-
-GET /{shortcode}
-
-**Behavior**
-- 302 Redirect to original URL if shortcode exists
-- 404 Not Found if shortcode is missing
-
----
-
-## 🗄️ Database Schema
-
-```sql
-CREATE TABLE urls (
-    id SERIAL PRIMARY KEY,
-    original_url TEXT NOT NULL,
-    shortcode VARCHAR(10) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    expires_at TIMESTAMP,
-    visit_count INTEGER DEFAULT 0
-);
-```
-
-## 📦 Project Structure
-
-```bash
-snapcrumb/
-├── cmd/server/          # App entrypoint
-├── internal/api/        # HTTP Handlers
-├── internal/db/         # Database logic
-├── internal/model/      # Data models
-├── pkg/utils/           # Helpers
-├── scripts/             # Deployment scripts
-├── Dockerfile           # Container config
-├── docker-compose.yml   # Local dev setup
-└── README.md            # This file
-```
-
-## 🐳 Quickstart (Local Dev) -- NOT COMPLETED YET
-
-1. Clone the repo
-
-```bash
-git clone https://github.com/yourusername/snapcrumb.git
-cd snapcrumb
-```
-
-2. Spin up using Docker
-
-```bash
-docker-compose up --build
-```
-
-3. Visit your local server
-
-```bash
-http://localhost:8080
-```
-
-## 🚀 Development
-
-To start the server with auto-reloading:
-
-- **On macOS/Linux**:
-```bash
-  ./dev.sh
-```
-- **On Windows (PowerShell)**:
-```powershell
-./dev.ps1
-```
-**Requires air (https://github.com/air-verse/air) to be installed**
-
-
-## 📈 Future Improvements (Roadmap)
-
-* URL expiration feature
-* Authentication for link management
-* Admin dashboard (metrics, stats)
-* Analytics dashboard (link clicks, source locations)
-* Fully automated CI/CD with GitHub Actions
-* Kubernetes deployment (advanced)
-
-## ✨ Credits
-
-Built by Eric Harris as part of a backend engineering and DevOps skill upgrade journey 🚀.
+Questions? Want to collaborate?  
+📧 ericktheredd5875@gmail.com  
+🔗 [LinkedIn](https://www.linkedin.com/in/eric-harris-20579232/)
